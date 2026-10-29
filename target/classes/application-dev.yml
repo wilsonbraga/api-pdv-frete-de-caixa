@@ -1,0 +1,37 @@
+# =============================================================
+# Profile DEV — ambiente local Windows
+# PostgreSQL 13 instalado localmente na porta 5433
+# Sem Docker, sem RabbitMQ
+# =============================================================
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/pdv_dev
+    username: postgres
+    password: pdv_pass
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: PDV-HikariPool-DEV
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    com.pdv: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+pdv:
+  cors:
+    allowed-origins: http://localhost:4200,https://2f1d-177-104-254-36.ngrok-free.app
+
+  

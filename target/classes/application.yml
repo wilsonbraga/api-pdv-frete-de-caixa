@@ -1,0 +1,142 @@
+spring:
+  application:
+    name: pdv-backend
+
+  profiles:
+    active: dev
+
+  # ===== JPA / HIBERNATE =====
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: America/Sao_Paulo
+        order_inserts: true
+        order_updates: true
+        batch_size: 30
+
+  # ===== FLYWAY =====
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    out-of-order: false
+
+  # ===== JACKSON =====
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    time-zone: America/Sao_Paulo
+    default-property-inclusion: NON_NULL
+
+  # ===== RABBITMQ =====
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 3000
+          max-attempts: 5
+          multiplier: 2
+
+  # ===== CACHE =====
+  cache:
+    type: simple
+
+  # ===== MAIL =====
+  # Configuração do servidor SMTP (Gmail com senha de app)
+  # Para gerar a senha de app: Conta Google → Segurança → Senhas de app
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: 
+    password: 
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# ===== SERVIDOR =====
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+
+# ===== CONFIGURAÇÕES CUSTOMIZADAS PDV =====
+pdv:
+  jwt:
+    secret: pdv-saas-secret-key-muito-longa-e-segura-para-desenvolvimento-local-2026
+    expiration-ms: 900000
+    refresh-expiration-ms: 604800000
+  cors:
+    allowed-origins: https://2f1d-177-104-254-36.ngrok-free.app,http://localhost:4200,
+  upload:
+    max-file-size: 5MB
+    allowed-types: image/jpeg,image/png,image/webp
+  sync:
+    batch-size: 100
+    max-retries: 3
+  mercadopago:
+    webhook-base-url: ${MP_WEBHOOK_BASE_URL:https://2f1d-177-104-254-36.ngrok-free.app}
+    expiracao-minutos: 30
+
+# ===== ALERTAS DE ESTOQUE =====
+# app.mail.enabled=true ativa o job de alerta diário de estoque mínimo.
+# Requer spring.mail configurado acima.
+app:
+  mail:
+    enabled: true
+  estoque:
+    alerta:
+      cron: "0 0 7 * * MON,FRI"   # Executa Segunda e Sexta às 07:00
+
+# ===== ACTUATOR =====
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+  health:
+    mail:
+      enabled: false   # Não inclui checagem de mail no /actuator/health
+
+# ===== SPRINGDOC / SWAGGER =====
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+# ===== LOGGING =====
+logging:
+  level:
+    root: INFO
+    com.pdv: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.springframework.security: INFO
+    org.springframework.amqp: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%logger{36}] - %msg%n"
